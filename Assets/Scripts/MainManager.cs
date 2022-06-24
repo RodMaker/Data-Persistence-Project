@@ -1,22 +1,43 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainManager : MonoBehaviour
 {
+    public static MainManager instance; // added
+
+    public Text playerText; // added
+
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
 
-    public Text ScoreText;
+    public Text ScoreText; // the one we want to save and load
     public GameObject GameOverText;
     
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
+
+    private void Awake()
+    {
+        // start of new code
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        // end of new code
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        
+        LoadPlayerNameAndScore();
+    }
 
     
     // Start is called before the first frame update
@@ -72,5 +93,38 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        //SceneManager.LoadScene(2);
+    }
+
+    [System.Serializable]
+    class SaveData
+    {
+        public Text playerText; // added
+        public Text ScoreText; // the one we want to save and load
+    }
+
+    public void SavePlayerNameAndScore()
+    {
+        SaveData data = new SaveData();
+        
+        data.playerText = playerText;
+        data.ScoreText = ScoreText;
+
+        string json = JsonUtility.ToJson(data);
+    
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
+    }
+
+    public void LoadPlayerNameAndScore()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+            playerText = data.playerText;
+            ScoreText = data.ScoreText;
+        }
     }
 }
