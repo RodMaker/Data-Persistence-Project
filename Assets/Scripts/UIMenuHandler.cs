@@ -11,13 +11,14 @@ using UnityEditor;
 [DefaultExecutionOrder(1000)]
 public class UIMenuHandler : MonoBehaviour
 {
-    public Text ScoreText;
+    public Text bestScore;
 
     // Start is called before the first frame update
     void Start()
     {
         //ColorPicker.SelectColor(MainManager.Instance.TeamColor); // added to load the saved color
-        ScoreText.text = "Best Score: " + MainManager.Instance.playerText;
+        LoadPlayerScore();
+        bestScore = MainManager.Instance.bestScore;
     }
 
     // Update is called once per frame
@@ -42,16 +43,14 @@ public class UIMenuHandler : MonoBehaviour
         #endif
     }
 
-    public void SavePlayerNameAndScore()
+    public void SavePlayerName()
     {
-        MainManager.Instance.SavePlayerNameAndScore();
+        Data.Instance.SavePlayerName();
     }
 
-    public void LoadPlayerNameAndScore()
+    public void LoadPlayerScore()
     {
-        MainManager.Instance.LoadPlayerNameAndScore();
-        ScoreText.text = MainManager.Instance.ScoreText;
-        playerText.text = MainManager.Instance.playerText;
+        bestScore = MainManager.Instance.bestScore;
         //ColorPicker.SelectColor(MainManager.Instance.TeamColor);
     }
 }

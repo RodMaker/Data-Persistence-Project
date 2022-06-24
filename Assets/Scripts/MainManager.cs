@@ -7,9 +7,10 @@ using UnityEngine.UI;
 
 public class MainManager : MonoBehaviour
 {
-    public static MainManager instance; // added
-
-    public Text playerText; // added
+    public static MainManager Instance; // added
+    private Data dataScript; // added
+    public InputField playerName; // added
+    public Text bestScore; // added
 
     public Brick BrickPrefab;
     public int LineCount = 6;
@@ -25,20 +26,9 @@ public class MainManager : MonoBehaviour
 
     private void Awake()
     {
-        // start of new code
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        // end of new code
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-        
-        LoadPlayerNameAndScore();
+        dataScript = GameObject.Find("Data").GetComponent<Data>();
+        LoadPlayerScore();
     }
-
     
     // Start is called before the first frame update
     void Start()
@@ -89,33 +79,38 @@ public class MainManager : MonoBehaviour
         ScoreText.text = $"Score : {m_Points}";
     }
 
+    void BestScore()
+    {
+        bestScore.text = $"Best Score: " + dataScript.playerName + " " + ScoreText.text;
+    }
+
     public void GameOver()
     {
         m_GameOver = true;
+        SavePlayerScore();
         GameOverText.SetActive(true);
-        //SceneManager.LoadScene(2);
     }
 
     [System.Serializable]
     class SaveData
     {
-        public Text playerText; // added
+        public InputField playerName; // added
         public Text ScoreText; // the one we want to save and load
+        public Text bestScore; // added
     }
 
-    public void SavePlayerNameAndScore()
+    public void SavePlayerScore()
     {
         SaveData data = new SaveData();
         
-        data.playerText = playerText;
-        data.ScoreText = ScoreText;
+        data.bestScore = bestScore;
 
         string json = JsonUtility.ToJson(data);
     
         File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
     }
 
-    public void LoadPlayerNameAndScore()
+    public void LoadPlayerScore()
     {
         string path = Application.persistentDataPath + "/savefile.json";
         if (File.Exists(path))
@@ -123,8 +118,19 @@ public class MainManager : MonoBehaviour
             string json = File.ReadAllText(path);
             SaveData data = JsonUtility.FromJson<SaveData>(json);
 
-            playerText = data.playerText;
-            ScoreText = data.ScoreText;
+            bestScore = data.bestScore;
+        }
+    }
+
+    public void LoadPlayerName()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+            playerName = data.playerName;
         }
     }
 }
