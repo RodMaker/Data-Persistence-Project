@@ -11,18 +11,10 @@ using UnityEditor;
 [DefaultExecutionOrder(1000)]
 public class UIMenuHandler : MonoBehaviour
 {
-    public Text bestScore;
+    [SerializeField] Text playerNameInput;
 
     // Start is called before the first frame update
     void Start()
-    {
-        //ColorPicker.SelectColor(MainManager.Instance.TeamColor); // added to load the saved color
-        LoadPlayerScore();
-        bestScore = MainManager.Instance.bestScore;
-    }
-
-    // Update is called once per frame
-    void Update()
     {
         
     }
@@ -32,25 +24,17 @@ public class UIMenuHandler : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
+    public void SetPlayerName()
+    {
+        Data.Instance.PlayerName = playerNameInput.text;
+    }
+
     public void Exit()
     {
-        //MainManager.Instance.SavePlayerNameAndScore();
-
         #if UNITY_EDITOR
             EditorApplication.ExitPlaymode();
         #else
             Application.Quit(); // original code to quit Unity player
         #endif
-    }
-
-    public void SavePlayerName()
-    {
-        Data.Instance.SavePlayerName();
-    }
-
-    public void LoadPlayerScore()
-    {
-        bestScore = MainManager.Instance.bestScore;
-        //ColorPicker.SelectColor(MainManager.Instance.TeamColor);
     }
 }
